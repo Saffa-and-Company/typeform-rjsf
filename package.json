@@ -1,6 +1,6 @@
 {
   "name": "@ctnetworks/typeform-rjsf",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.1-beta",
   "description": "A customizable form renderer built with React and RJSF",
   "main": "dist/typeform-rjsf.umd.js",
   "module": "dist/typeform-rjsf.es.js",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Saffa-and-Company/typeform-rjsf"
+    "url": "git+https://github.com/Saffa-and-Company/typeform-rjsf.git"
   },
   "dependencies": {
     "@rjsf/core": "^5.21.2",
