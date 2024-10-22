@@ -43,14 +43,21 @@ const exampleSchema: TypeformRjsfSchema = {
 
 const App: React.FC = () => {
   const handleSubmit = (formData: JSONSchema7) => {
-    alert("Form submitted");
     console.log("Form submitted with complete data:", formData);
     console.table(formData);
   };
 
+  const handleTimeSpent = (timeSpentData: Record<string, number>) => {
+    console.log("Time spent data:", timeSpentData);
+  };
+
   return (
     <div className="App">
-      <FormRenderer schema={exampleSchema} handleSubmit={handleSubmit} />
+      <FormRenderer
+        schema={exampleSchema}
+        handleSubmit={handleSubmit}
+        handleTimeSpent={handleTimeSpent}
+      />
     </div>
   );
 };

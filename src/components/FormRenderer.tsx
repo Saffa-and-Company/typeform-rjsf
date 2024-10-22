@@ -17,11 +17,14 @@ import validator from "@rjsf/validator-ajv8";
 interface FormRendererProps {
   schema: TypeformRjsfSchema;
   handleSubmit: (formData: JSONSchema7) => void;
+
+  handleTimeSpent?: (timeSpentData: Record<string, number>) => void;
 }
 
 const FormRenderer: React.FC<FormRendererProps> = ({
   schema,
   handleSubmit,
+  handleTimeSpent,
 }) => {
   const [currentStep, setCurrentStep] = useState(-1);
   const [formData, setFormData] = useState({});
@@ -30,6 +33,10 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   const totalSteps = fields.length + 1;
   const [errors, setErrors] = useState<ErrorSchema | undefined>(undefined);
   const [isValid, setIsValid] = useState(true);
+  const [startTime, setStartTime] = useState<number>(Date.now());
+  const [timeSpentData, setTimeSpentData] = useState<Record<string, number>>(
+    {}
+  );
 
   useEffect(() => {
     if (currentStep >= 0 && currentStep < fields.length) {
@@ -39,16 +46,74 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     }
   }, [currentStep, formData]);
 
+  // Update timer when step changes
+  useEffect(() => {
+    if (currentStep >= 0 && currentStep < fields.length) {
+      // Reset start time whenever we switch to a new question
+      setStartTime(Date.now());
+    }
+  }, [currentStep]);
+
+  const handleNext = () => {
+    if (currentStep === -1) {
+      setCurrentStep(0);
+      return;
+    }
+
+    const isCurrentFieldValid = validateCurrentField();
+    if (!isCurrentFieldValid) {
+      setIsValid(false);
+      return;
+    }
+
+    if (currentStep >= 0 && currentStep < fields.length) {
+      // Calculate time spent on current question
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+      // Add to existing time for this question (if any)
+      setTimeSpentData((prev) => ({
+        ...prev,
+        [currentField]: (prev[currentField] || 0) + timeSpent,
+      }));
+    }
+
+    if (currentStep === totalSteps - 2) {
+      // Calculate final time for last question and submit
+      const timeSpent = Math.round((Date.now() - startTime) / 1000);
+      const finalTimeSpentData = {
+        ...timeSpentData,
+        [currentField]: (timeSpentData[currentField] || 0) + timeSpent,
+      };
+      handleSubmit(formData);
+      handleTimeSpent?.(finalTimeSpentData);
+    }
+
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+      setIsValid(true);
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
+        event.preventDefault(); // Prevent default form submission
+        if (!isValid) return; // Don't proceed if the field is invalid
         handleNext();
       }
     };
 
+    // Attach the event listener to the form element instead of window
+    const form = document.querySelector("form");
+    if (form) {
+      form.addEventListener("keydown", handleKeyDown);
+      return () => form.removeEventListener("keydown", handleKeyDown);
+    }
+
+    // Fallback to window listener if form is not found
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentStep]);
+  }, [currentStep, isValid, handleNext]);
 
   // Add this function to validate the current field
   const validateCurrentField = () => {
@@ -81,29 +146,19 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   };
 
   // Update handleNext to use validation
-  const handleNext = () => {
-    if (currentStep === -1) {
-      setCurrentStep(0);
-      return;
-    }
-
-    const isCurrentFieldValid = validateCurrentField();
-    if (!isCurrentFieldValid) {
-      setIsValid(false);
-      return;
-    }
-    if (currentStep === totalSteps - 2) {
-      handleSubmit(formData);
-    }
-
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
-      setIsValid(true);
-    }
-  };
 
   const goBack = () => {
-    if (currentStep > -1) setCurrentStep(currentStep - 1);
+    if (currentStep > -1) {
+      // Save time spent on current question before going back
+      if (currentStep < fields.length) {
+        const timeSpent = Math.round((Date.now() - startTime) / 1000);
+        setTimeSpentData((prev) => ({
+          ...prev,
+          [currentField]: (prev[currentField] || 0) + timeSpent,
+        }));
+      }
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   // Update onChange to use the validator
