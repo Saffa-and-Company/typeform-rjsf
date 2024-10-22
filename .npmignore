@@ -1,0 +1,12 @@
+node_modules/
+example/
+.git/
+.gitignore
+.DS_Store
+*.log
+src/
+vite.config.ts
+tsconfig.json
+postcss.config.js
+tailwind.config.js
+
