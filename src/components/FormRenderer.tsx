@@ -258,11 +258,11 @@ const FormRenderer: React.FC<FormRendererProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-red-300">
+    <div className="fixed inset-0 flex items-center justify-center bg-white">
       <div className="absolute top-0 left-0 right-0 p-4">
         <ProgressBar current={currentStep + 1} total={totalSteps} />
       </div>
-      <div className="bg-white p-8 min-w-[640px] min-h-[372px] rounded-lg shadow-xl flex flex-col">
+      <div className="p-8 rounded-lg shadow-xl flex flex-col">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -284,6 +284,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         />
       </div>
     </div>
+
   );
 };
 
@@ -307,9 +308,8 @@ const NavigationButtons: React.FC<{
   isNextDisabled?: boolean;
 }> = ({ currentStep, totalSteps, onBack, onNext, isNextDisabled }) => (
   <div
-    className={`flex ${
-      currentStep === -1 ? "justify-center items-center" : "justify-between"
-    }`}
+    className={`flex ${currentStep === -1 ? "justify-center items-center" : "justify-between"
+      }`}
   >
     {currentStep > -1 && currentStep < totalSteps - 1 && (
       <motion.button
@@ -318,7 +318,7 @@ const NavigationButtons: React.FC<{
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <span className="text-white text-sm font-semibold uppercase leading-[21px] tracking-widest">
+        <span className="text-black text-sm font-semibold uppercase leading-[21px] tracking-widest">
           ← Back
         </span>
       </motion.button>
@@ -328,15 +328,14 @@ const NavigationButtons: React.FC<{
         <motion.button
           onClick={onNext}
           disabled={isNextDisabled}
-          className={`w-48 px-5 py-2 rounded-full justify-center items-center inline-flex ${
-            isNextDisabled
+          className={`w-48 px-5 py-2 rounded-full justify-center items-center inline-flex ${isNextDisabled
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-[#333e48] hover:scale-105 active:scale-95"
-          }`}
+            }`}
           whileHover={!isNextDisabled ? { scale: 1.05 } : undefined}
           whileTap={!isNextDisabled ? { scale: 0.95 } : undefined}
         >
-          <span className="text-white text-sm font-semibold uppercase leading-[21px] tracking-widest">
+          <span className="text-black text-sm font-semibold uppercase leading-[21px] tracking-widest">
             {currentStep === -1 ? "Start" : "Next →"}
           </span>
         </motion.button>
@@ -360,33 +359,27 @@ const WelcomeScreen: React.FC<{
   schema: TypeformRjsfSchema;
 }> = ({ onStart, schema }) => (
   <motion.div
-    className="h-[372px] flex-col justify-start items-start gap-2.5 inline-flex"
+    className="flex flex-col justify-center items-center h-full p-4"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
   >
-    <div className="w-[623px] h-[370px] relative bg-white/70 rounded-[10px]">
-      <div className="absolute inset-0 flex flex-col justify-center items-center gap-6">
-        <div className="flex-col justify-start items-start gap-3.5 flex">
-          <motion.h1
-            className="w-[547px] text-center text-[#333133] text-[22px] font-semibold"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {schema.title || "Welcome"}
-          </motion.h1>
-          <motion.p
-            className="w-[547px] text-center text-[#333133] text-sm font-normal"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            {schema.description || "Please fill out the following form."}
-          </motion.p>
-        </div>
-      </div>
-    </div>
+    <motion.h1
+      className="text-center text-black text-lg font-semibold"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.2 }}
+    >
+      {schema.title || "Welcome"}
+    </motion.h1>
+    <motion.p
+      className="text-center text-black text-sm font-normal mt-2"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.4 }}
+    >
+      {schema.description || "Please fill out the following form."}
+    </motion.p>
   </motion.div>
 );
 
