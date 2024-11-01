@@ -12,7 +12,7 @@ import CheckboxWidget from "./CustomWidgets/CheckboxWidget";
 import ImageWidget from "./CustomWidgets/ImageWidget";
 import { TypeformRjsfSchema } from "../schemas/TypeformRjsfSchema";
 import pressEnter from "../assets/icons/pressEnter.svg";
-import { ErrorSchema, RJSFSchema } from "@rjsf/utils";
+import { ErrorSchema, RJSFSchema } from "@rjsf/utils"; 
 import validator from "@rjsf/validator-ajv8";
 interface FormRendererProps {
   schema: TypeformRjsfSchema;
