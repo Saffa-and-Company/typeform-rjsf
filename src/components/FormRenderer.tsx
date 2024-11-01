@@ -9,11 +9,11 @@ import NumberWidget from "./CustomWidgets/NumberWidget";
 import EmailWidget from "./CustomWidgets/EmailWidget";
 import SelectWidget from "./CustomWidgets/SelectWidget";
 import CheckboxWidget from "./CustomWidgets/CheckboxWidget";
+import ImageWidget from "./CustomWidgets/ImageWidget";
 import { TypeformRjsfSchema } from "../schemas/TypeformRjsfSchema";
 import pressEnter from "../assets/icons/pressEnter.svg";
 import { ErrorSchema, RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
-
 interface FormRendererProps {
   schema: TypeformRjsfSchema;
   handleSubmit: (formData: JSONSchema7) => void;
@@ -184,78 +184,80 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     setErrors(result.errorSchema);
   };
 
-  const getWidgetType = (field: string): string => {
-    const fieldSchema = schema.properties?.[field] as JSONSchema7;
-    if (!fieldSchema) return "text";
+    const getWidgetType = (field: string): string => {
+      const fieldSchema = schema.properties?.[field] as JSONSchema7;
+      if (!fieldSchema) return "text";
 
-    switch (fieldSchema.type) {
-      case "string":
-        if (fieldSchema.format === "email") return "email";
-        if (fieldSchema.enum) return "select";
-        return "text";
-      case "integer":
-      case "number":
-        return "number";
-      case "boolean":
-        return "checkbox";
-      default:
-        return "text";
-    }
-  };
+      switch (fieldSchema.type) {
+        case "string":
+          if (fieldSchema.format === "email") return "email";
+          if (fieldSchema.format === "binary") return "file";
+          if (fieldSchema.enum) return "select";
+          return "text";
+        case "integer":
+        case "number":
+          return "number";
+        case "boolean":
+          return "checkbox";
+        default:
+          return "text";
+      }
+    };
 
-  const renderContent = () => {
-    if (currentStep === -1) {
-      return <WelcomeScreen onStart={handleNext} schema={schema} />;
-    } else if (currentStep === fields.length) {
-      return <ThankYouScreen />;
-    } else {
-      const widgetType = getWidgetType(currentField);
-      const fieldSchema = schema.properties?.[currentField] as JSONSchema7;
+    const renderContent = () => {
+      if (currentStep === -1) {
+        return <WelcomeScreen onStart={handleNext} schema={schema} />;
+      } else if (currentStep === fields.length) {
+        return <ThankYouScreen />;
+      } else {
+        const widgetType = getWidgetType(currentField);
+        const fieldSchema = schema.properties?.[currentField] as JSONSchema7;
 
-      return (
-        <Form
-          schema={{
-            type: "object",
-            properties: {
+        return (
+          <Form
+            schema={{
+              type: "object",
+              properties: {
+                [currentField]: {
+                  ...fieldSchema,
+                  title: undefined, // Remove RJSF's default title
+                  description: undefined, // Remove RJSF's default description
+                },
+              },
+              required: schema.required?.includes(currentField)
+                ? [currentField]
+                : [],
+            }}
+            formData={formData}
+            validator={validator}
+            showErrorList={false}
+            uiSchema={{
               [currentField]: {
-                ...fieldSchema,
-                title: undefined, // Remove RJSF's default title
-                description: undefined, // Remove RJSF's default description
+                "ui:widget": widgetType,
+                "ui:title": fieldSchema.title, // Pass title to custom widget
+                "ui:description": fieldSchema.description,
+                "ui:options": {
+                  label: false, // Disable RJSF's label rendering
+                  description: false, // Disable RJSF's description rendering
+                },
               },
-            },
-            required: schema.required?.includes(currentField)
-              ? [currentField]
-              : [],
-          }}
-          formData={formData}
-          validator={validator}
-          showErrorList={false}
-          uiSchema={{
-            [currentField]: {
-              "ui:widget": widgetType,
-              "ui:title": fieldSchema.title, // Pass title to custom widget
-              "ui:description": fieldSchema.description,
-              "ui:options": {
-                label: false, // Disable RJSF's label rendering
-                description: false, // Disable RJSF's description rendering
-              },
-            },
-          }}
-          widgets={{
-            text: TextWidget,
-            number: NumberWidget,
-            email: EmailWidget,
-            select: SelectWidget,
-            checkbox: CheckboxWidget,
-          }}
-          formContext={{ errors }}
-          onChange={onChange}
-        >
-          <div></div>
-        </Form>
-      );
-    }
-  };
+            }}
+            widgets={{
+              text: TextWidget,
+              number: NumberWidget,
+              email: EmailWidget,
+              select: SelectWidget,
+              checkbox: CheckboxWidget,
+              file: ImageWidget,
+            }}
+            formContext={{ errors }}
+            onChange={onChange}
+          >
+            <div></div>
+          </Form>
+        );
+      }
+    };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white">

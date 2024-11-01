@@ -1,7 +1,7 @@
 /**
  * Allowed JSON Schema types.
  */
-type AllowedTypes = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null";
+type AllowedTypes = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null" | "file";
 /**
  * Represents a field in the form.
  */
@@ -13,7 +13,9 @@ interface FormField {
     default?: any;
     minimum?: number;
     maximum?: number;
-    format?: "email";
+    format?: "email" | "binary";
+    accept?: string;
+    maxFileSize?: number;
 }
 /**
  * TypeformRjsfSchema represents the structure of a form for RJSF.
