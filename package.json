@@ -1,6 +1,6 @@
 {
   "name": "@ctnetworks/typeform-rjsf",
-  "version": "0.1.1-beta",
+  "version": "0.1.2-beta",
   "description": "A customizable form renderer built with React and RJSF",
   "main": "dist/typeform-rjsf.umd.js",
   "module": "dist/typeform-rjsf.es.js",
