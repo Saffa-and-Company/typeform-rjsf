@@ -13,7 +13,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
   formContext,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const options = schema.enum || [];
+  const options = uiSchema?.["ui:enumOptions"] || [];
   const title = uiSchema?.["ui:title"] || schema.title;
   const description = uiSchema?.["ui:description"] || schema.description;
 
@@ -48,7 +48,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
         <select
           id={id}
           value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange([e.target.value])}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={`w-full px-4 py-3 text-xl border-b-2 focus:outline-none transition-colors duration-300 bg-transparent appearance-none ${
@@ -60,7 +60,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
           <option value="" disabled>
             {placeholder || description || "Please select an option"}
           </option>
-          {options.map((option) => {
+          {options.map((option: string) => {
             const optionValue =
               typeof option === "string" || typeof option === "number"
                 ? option

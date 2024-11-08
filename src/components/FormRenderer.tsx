@@ -14,6 +14,7 @@ import { TypeformRjsfSchema } from "../schemas/TypeformRjsfSchema";
 import pressEnter from "../assets/icons/pressEnter.svg";
 import { ErrorSchema, RJSFSchema } from "@rjsf/utils"; 
 import validator from "@rjsf/validator-ajv8";
+import RadioWidget from "./CustomWidgets/RadioWidget";
 interface FormRendererProps {
   schema: TypeformRjsfSchema;
   handleSubmit: (formData: JSONSchema7) => void;
@@ -144,7 +145,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
     return result.errors.length === 0;
   };
-
+  
+  
   // Update handleNext to use validation
 
   const goBack = () => {
@@ -192,13 +194,18 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         case "string":
           if (fieldSchema.format === "email") return "email";
           if (fieldSchema.format === "binary") return "file";
-          if (fieldSchema.enum) return "select";
+          if (fieldSchema.enum && Array.isArray(fieldSchema.enum)) return "select";
           return "text";
         case "integer":
         case "number":
           return "number";
         case "boolean":
-          return "checkbox";
+          return fieldSchema.oneOf ? "radio" : "checkbox";
+          case "array":
+      if (fieldSchema.items && typeof fieldSchema.items === "object" && "enum" in fieldSchema.items) {
+        return "select";
+      }
+      return "multi-select";
         default:
           return "text";
       }
@@ -212,6 +219,19 @@ const FormRenderer: React.FC<FormRendererProps> = ({
       } else {
         const widgetType = getWidgetType(currentField);
         const fieldSchema = schema.properties?.[currentField] as JSONSchema7;
+
+        let enumOptions = [];
+
+         // Check if fieldSchema.type is "array" and enum is inside "items"
+    if (
+      fieldSchema.type === "array" &&
+      fieldSchema.items &&
+      typeof fieldSchema.items !== "boolean" &&
+      "enum" in fieldSchema.items
+    ) {
+      enumOptions = (fieldSchema.items as { enum: any[] }).enum; // Typecast items to have an enum
+    }
+
 
         return (
           <Form
@@ -240,6 +260,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
                   label: false, // Disable RJSF's label rendering
                   description: false, // Disable RJSF's description rendering
                 },
+                "ui:enumOptions": enumOptions, // Pass enum options to the widget
               },
             }}
             widgets={{
@@ -248,6 +269,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
               email: EmailWidget,
               select: SelectWidget,
               checkbox: CheckboxWidget,
+              radio: RadioWidget,
               file: ImageWidget,
             }}
             formContext={{ errors }}
