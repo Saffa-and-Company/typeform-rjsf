@@ -12,7 +12,7 @@ import CheckboxWidget from "./CustomWidgets/CheckboxWidget";
 import ImageWidget from "./CustomWidgets/ImageWidget";
 import { TypeformRjsfSchema } from "../schemas/TypeformRjsfSchema";
 import pressEnter from "../assets/icons/pressEnter.svg";
-import { ErrorSchema, RJSFSchema } from "@rjsf/utils"; 
+import { ErrorSchema, RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import RadioWidget from "./CustomWidgets/RadioWidget";
 interface FormRendererProps {
@@ -145,8 +145,8 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
     return result.errors.length === 0;
   };
-  
-  
+
+
   // Update handleNext to use validation
 
   const goBack = () => {
@@ -186,107 +186,112 @@ const FormRenderer: React.FC<FormRendererProps> = ({
     setErrors(result.errorSchema);
   };
 
-    const getWidgetType = (field: string): string => {
-      const fieldSchema = schema.properties?.[field] as JSONSchema7;
-      if (!fieldSchema) return "text";
+  const getWidgetType = (field: string): string => {
+    const fieldSchema = schema.properties?.[field] as JSONSchema7;
+    if (!fieldSchema) return "text";
 
-      switch (fieldSchema.type) {
-        case "string":
-          if (fieldSchema.format === "email") return "email";
-          if (fieldSchema.format === "binary") return "file";
-          if (fieldSchema.enum && Array.isArray(fieldSchema.enum)) return "select";
-          return "text";
-        case "integer":
-        case "number":
-          return "number";
-        case "boolean":
-          return fieldSchema.oneOf ? "radio" : "checkbox";
-          case "array":
-      if (fieldSchema.items && typeof fieldSchema.items === "object" && "enum" in fieldSchema.items) {
-        return "select";
-      }
-      return "multi-select";
-        default:
-          return "text";
-      }
-    };
-
-    const renderContent = () => {
-      if (currentStep === -1) {
-        return <WelcomeScreen onStart={handleNext} schema={schema} />;
-      } else if (currentStep === fields.length) {
-        return <ThankYouScreen />;
-      } else {
-        const widgetType = getWidgetType(currentField);
-        const fieldSchema = schema.properties?.[currentField] as JSONSchema7;
-
-        let enumOptions = [];
-
-         // Check if fieldSchema.type is "array" and enum is inside "items"
-    if (
-      fieldSchema.type === "array" &&
-      fieldSchema.items &&
-      typeof fieldSchema.items !== "boolean" &&
-      "enum" in fieldSchema.items
-    ) {
-      enumOptions = (fieldSchema.items as { enum: any[] }).enum; // Typecast items to have an enum
+    switch (fieldSchema.type) {
+      case "string":
+        if (fieldSchema.format === "email") return "email";
+        if (fieldSchema.format === "binary") return "file";
+        if (fieldSchema.enum && Array.isArray(fieldSchema.enum)) return "select";
+        return "text";
+      case "integer":
+      case "number":
+        return "number";
+      case "boolean":
+        return fieldSchema.oneOf ? "radio" : "checkbox";
+      case "array":
+        if (fieldSchema.items && typeof fieldSchema.items === "object" && "enum" in fieldSchema.items) {
+          return "select";
+        }
+        return "multi-select";
+      default:
+        return "text";
     }
+  };
 
+  const renderContent = () => {
+    if (currentStep === -1) {
+      return <WelcomeScreen onStart={handleNext} schema={schema} />;
+    } else if (currentStep === fields.length) {
+      return <ThankYouScreen />;
+    } else {
+      const widgetType = getWidgetType(currentField);
+      const fieldSchema = schema.properties?.[currentField] as JSONSchema7;
 
-        return (
-          <Form
-            schema={{
-              type: "object",
-              properties: {
-                [currentField]: {
-                  ...fieldSchema,
-                  title: undefined, // Remove RJSF's default title
-                  description: undefined, // Remove RJSF's default description
-                },
-              },
-              required: schema.required?.includes(currentField)
-                ? [currentField]
-                : [],
-            }}
-            formData={formData}
-            validator={validator}
-            showErrorList={false}
-            uiSchema={{
-              [currentField]: {
-                "ui:widget": widgetType,
-                "ui:title": fieldSchema.title, // Pass title to custom widget
-                "ui:description": fieldSchema.description,
-                "ui:options": {
-                  label: false, // Disable RJSF's label rendering
-                  description: false, // Disable RJSF's description rendering
-                },
-                "ui:enumOptions": enumOptions, // Pass enum options to the widget
-              },
-            }}
-            widgets={{
-              text: TextWidget,
-              number: NumberWidget,
-              email: EmailWidget,
-              select: SelectWidget,
-              checkbox: CheckboxWidget,
-              radio: RadioWidget,
-              file: ImageWidget,
-            }}
-            formContext={{ errors }}
-            onChange={onChange}
-          >
-            <div></div>
-          </Form>
-        );
+      let enumOptions = [];
+
+      if(fieldSchema.type === "string" && fieldSchema.enum) {
+        enumOptions = fieldSchema.enum;
       }
-    };
+
+      // Check if fieldSchema.type is "array" and enum is inside "items"
+      else if (
+        fieldSchema.type === "array" &&
+        fieldSchema.items &&
+        typeof fieldSchema.items !== "boolean" &&
+        "enum" in fieldSchema.items
+      ) {
+        enumOptions = (fieldSchema.items as { enum: any[] }).enum; // Typecast items to have an enum
+      }
+
+
+      return (
+        <Form
+          schema={{
+            type: "object",
+            properties: {
+              [currentField]: {
+                ...fieldSchema,
+                title: undefined, // Remove RJSF's default title
+                description: undefined, // Remove RJSF's default description
+              },
+            },
+            required: schema.required?.includes(currentField)
+              ? [currentField]
+              : [],
+          }}
+          formData={formData}
+          validator={validator}
+          showErrorList={false}
+          uiSchema={{
+            [currentField]: {
+              "ui:widget": widgetType,
+              "ui:title": fieldSchema.title,
+              "ui:description": fieldSchema.description,
+              "ui:options": {
+                label: false, // Disable RJSF's label rendering
+                description: false, // Disable RJSF's description rendering
+              },
+              "ui:enumOptions": enumOptions, // Pass enum options to the widget
+              "ui:questionNumber": currentStep + 1,
+            },
+          }}
+          widgets={{
+            text: TextWidget,
+            number: NumberWidget,
+            email: EmailWidget,
+            select: SelectWidget,
+            checkbox: CheckboxWidget,
+            radio: RadioWidget,
+            file: ImageWidget,
+          }}
+          formContext={{ errors }}
+          onChange={onChange}
+        >
+          <div></div>
+        </Form>
+      );
+    }
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white">
-      <div className="absolute top-0 left-0 right-0 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-transparent">
+      {/* <div className="absolute top-0 left-0 right-0 p-4">
         <ProgressBar current={currentStep + 1} total={totalSteps} />
-      </div>
-      <div className="p-8 rounded-lg shadow-xl flex flex-col">
+      </div> */}
+      <div className="p-8 shadow-xl flex flex-col bg-white max-w-[384px] md:max-w-[768px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -348,30 +353,35 @@ const NavigationButtons: React.FC<{
       </motion.button>
     )}
     {currentStep < totalSteps - 1 && (
-      <div className="relative">
+      <div className="flex gap-4 my-6">
         <motion.button
           onClick={onNext}
           disabled={isNextDisabled}
-          className={`w-48 px-5 py-2 rounded-full justify-center items-center inline-flex ${isNextDisabled
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#333e48] hover:scale-105 active:scale-95"
-            }`}
+          className={`w-48 px-5 py-2 justify-center items-center inline-flex text-black text-sm font-semibold uppercase leading-[21px] tracking-widest ${isNextDisabled
+            ? "bg-gray-300 cursor-not-allowed"
+            : "bg-[#333e48] hover:scale-105 active:scale-95"
+            } bg-black text-white py-1 px-4`}
           whileHover={!isNextDisabled ? { scale: 1.05 } : undefined}
           whileTap={!isNextDisabled ? { scale: 0.95 } : undefined}
         >
-          <span className="text-black text-sm font-semibold uppercase leading-[21px] tracking-widest">
-            {currentStep === -1 ? "Start" : "Next →"}
-          </span>
+          {/* <span className="text-black text-sm font-semibold uppercase leading-[21px] tracking-widest"> */}
+          {currentStep === -1 ? "Get Started" : "Next →"}
+          {/* </span> */}
         </motion.button>
+        {/* <img
+          src={pressEnter}
+          alt="Press Enter"
+          className="w-[80.08px] h-[13.12px]"
+        /> */}
 
         {currentStep === -1 && (
-          <div className="absolute top-3 -right-24">
+          // <div className="absolute top-3 -right-24">
             <img
               src={pressEnter}
               alt="Press Enter"
               className="w-[80.08px] h-[13.12px]"
             />
-          </div>
+          // </div>
         )}
       </div>
     )}
@@ -383,7 +393,7 @@ const WelcomeScreen: React.FC<{
   schema: TypeformRjsfSchema;
 }> = ({ onStart, schema }) => (
   <motion.div
-    className="flex flex-col justify-center items-center h-full p-4"
+    className="flex flex-col justify-center items-center h-full gap-2 mb-4"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}

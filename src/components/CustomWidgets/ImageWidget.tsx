@@ -16,6 +16,7 @@ const ImageWidget: React.FC<WidgetProps> = ({
   const [preview, setPreview] = useState(value || "");
   const title = uiSchema?.["ui:title"] || schema.title;
   const description = uiSchema?.["ui:description"] || schema.description;
+  const questionNumber = uiSchema?.["ui:questionNumber"];
 
   // Get error message from formContext
   const fieldError = formContext?.errors?.[id];
@@ -54,7 +55,7 @@ const ImageWidget: React.FC<WidgetProps> = ({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {title} {required && <span className="text-red-500">*</span>}
+        {questionNumber}. {title} {required && <span className="text-red-500">*</span>}
       </motion.label>
       <motion.div
         className="relative"

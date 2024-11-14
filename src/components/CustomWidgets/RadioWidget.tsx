@@ -22,6 +22,7 @@ const RadioWidget: React.FC<WidgetProps> = ({
       ];
 
   const title = uiSchema?.["ui:title"] || schema.title;
+  const questionNumber = uiSchema?.["ui:questionNumber"];
   const fieldError = formContext?.errors?.[id];
   const errorMessage = fieldError?.__errors?.[0];
   const hasError = !!errorMessage;
@@ -37,7 +38,7 @@ const RadioWidget: React.FC<WidgetProps> = ({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {title} {required && <span className="text-red-500">*</span>}
+        {questionNumber}. {title} {required && <span className="text-red-500">*</span>}
       </motion.label>
       <motion.div
         className="space-y-2"

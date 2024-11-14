@@ -13,11 +13,13 @@ const CheckboxWidget: React.FC<WidgetProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const title = uiSchema?.["ui:title"] || schema.title;
+  const questionNumber = uiSchema?.["ui:questionNumber"];
 
   // Get error message from formContext
   const fieldError = formContext?.errors?.[id];
   const errorMessage = fieldError?.__errors?.[0];
   const hasError = !!errorMessage;
+  
 
   return (
     <div className="mb-6 flex flex-col items-center">

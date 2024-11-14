@@ -15,6 +15,7 @@ const EmailWidget: React.FC<WidgetProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const title = uiSchema?.["ui:title"] || schema.title;
   const description = uiSchema?.["ui:description"] || schema.description;
+  const questionNumber = uiSchema?.["ui:questionNumber"];
 
   // Get error message from formContext
   const fieldError = formContext?.errors?.[id];

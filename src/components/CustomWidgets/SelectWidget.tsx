@@ -16,6 +16,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
   const options = uiSchema?.["ui:enumOptions"] || [];
   const title = uiSchema?.["ui:title"] || schema.title;
   const description = uiSchema?.["ui:description"] || schema.description;
+  const questionNumber = uiSchema?.["ui:questionNumber"];
 
   // Get error message from formContext
   const fieldError = formContext?.errors?.[id];
@@ -37,7 +38,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {title} {required && <span className="text-red-500">*</span>}
+        {questionNumber}. {title} {required && <span className="text-red-500">*</span>}
       </motion.label>
       <motion.div
         className="relative"
@@ -48,7 +49,7 @@ const SelectWidget: React.FC<WidgetProps> = ({
         <select
           id={id}
           value={value || ""}
-          onChange={(e) => onChange([e.target.value])}
+          onChange={(e) => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={`w-full px-4 py-3 text-xl border-b-2 focus:outline-none transition-colors duration-300 bg-transparent appearance-none ${
