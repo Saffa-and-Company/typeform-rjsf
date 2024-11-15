@@ -195,6 +195,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
         if (fieldSchema.format === "email") return "email";
         if (fieldSchema.format === "binary") return "file";
         if (fieldSchema.enum && Array.isArray(fieldSchema.enum)) return "select";
+        if (fieldSchema.format === "multiline") return "textarea";
         return "text";
       case "integer":
       case "number":
@@ -270,6 +271,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
           }}
           widgets={{
             text: TextWidget,
+            textarea: TextWidget,
             number: NumberWidget,
             email: EmailWidget,
             select: SelectWidget,

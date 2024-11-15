@@ -1,7 +1,7 @@
 /**
  * Allowed JSON Schema types.
  */
-type AllowedTypes = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null" | "file";
+type AllowedTypes = "string" | "number" | "integer" | "boolean" | "object" | "array" | "null" | "file" | "textarea";
 
 /**
  * Represents a field in the form.
@@ -16,7 +16,7 @@ interface FormField {
   minimum?: number;
   maximum?: number;
   // New property for email validation
-  format?: "email"| "binary";
+  format?: "email"| "binary" | "multiline";
   accept?: string;  // Specifies accepted file types, e.g., "image/*" or ".jpg,.png"
   maxFileSize?: number;
 }
