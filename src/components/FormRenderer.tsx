@@ -203,8 +203,12 @@ const FormRenderer: React.FC<FormRendererProps> = ({
       case "boolean":
         return fieldSchema.oneOf ? "radio" : "checkbox";
       case "array":
-        if (fieldSchema.items && typeof fieldSchema.items === "object" && "enum" in fieldSchema.items) {
-          return "select";
+        if (
+          fieldSchema.items &&
+          typeof fieldSchema.items === "object" &&
+          "enum" in fieldSchema.items
+        ) {
+          return "checkbox"; // Array-based multi-select -> checkboxes
         }
         return "multi-select";
       default:
@@ -223,7 +227,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({
 
       let enumOptions = [];
 
-      if(fieldSchema.type === "string" && fieldSchema.enum) {
+      if (fieldSchema.type === "string" && fieldSchema.enum) {
         enumOptions = fieldSchema.enum;
       }
 
@@ -378,11 +382,11 @@ const NavigationButtons: React.FC<{
 
         {currentStep === -1 && (
           // <div className="absolute top-3 -right-24">
-            <img
-              src={pressEnter}
-              alt="Press Enter"
-              className="w-[80.08px] h-[13.12px]"
-            />
+          <img
+            src={pressEnter}
+            alt="Press Enter"
+            className="w-[80.08px] h-[13.12px]"
+          />
           // </div>
         )}
       </div>
